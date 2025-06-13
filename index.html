@@ -138,12 +138,17 @@
     });
 
     document.getElementById("copyBtn").addEventListener("click", () => {
-      const text = points
-        .map((pt, i) => `${pointLabels[i] || i + 1}: (${pt.x.toFixed(1)}, ${pt.y.toFixed(1)})`)
-        .join("\n");
-      navigator.clipboard.writeText(text).then(() => {
-        alert("좌표가 복사되었습니다!");
-      });
+      if (points.length < 6) {
+        alert("6개의 좌표를 모두 선택한 후 복사할 수 있습니다.");
+        return;
+      }
+      const fileName = imageList[currentImageIndex];
+      const yValues = points.map((pt) => pt.y.toFixed(1));
+      const csvLine = `${fileName},${yValues.join(",")}`;
+      navigator.clipboard.writeText("파일명,정수리Y,턱Y,가랑이Y,발끝Y,배꼽Y,손끝Y\n" + csvLine)
+        .then(() => {
+          alert("CSV 형식으로 복사되었습니다!");
+        });
     });
 
     loadImage(currentImageIndex);
