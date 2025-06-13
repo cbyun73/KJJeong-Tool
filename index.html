@@ -1,23 +1,40 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>정경진 측정 도구</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Image Analyzer</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      margin-top: 10px;
+    }
+    .button-group {
+      margin-top: 10px;
+    }
+    button {
+      margin: 0 5px;
+      padding: 8px 12px;
+    }
+  </style>
 </head>
 <body>
-  <h1>정경진 측정 도구</h1>
-
-  <canvas id="imageCanvas" width="800" height="1000"></canvas>
-
-  <div style="margin-top: 20px;">
+  <h2>정경진 이미지 측정 도구</h2>
+  <div class="button-group">
     <button id="prevBtn">이전</button>
     <button id="nextBtn">다음</button>
     <button id="resetBtn">초기화</button>
   </div>
-
+  <canvas id="imageCanvas" width="800" height="1200"></canvas>
   <script>
-    const imageFiles = [
+    let currentImageIndex = 0;
+    const imageList = [
       "KJJeong1.png",
       "KJJeong2.png",
       "KJJeong3.png",
@@ -31,61 +48,78 @@
       "KJJeong11.png"
     ];
 
-    let currentIndex = 0;
     const canvas = document.getElementById("imageCanvas");
     const ctx = canvas.getContext("2d");
 
-    let points = [];
+    let img = new Image();
+    let clickPoints = [];
 
-    function loadImage() {
-      const img = new Image();
-      img.onload = function () {
+    function loadImage(src) {
+      img.onload = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        points = [];
+        const ratio = Math.min(canvas.width / img.width, canvas.height / img.height);
+        const newWidth = img.width * ratio;
+        const newHeight = img.height * ratio;
+        const xOffset = (canvas.width - newWidth) / 2;
+        const yOffset = (canvas.height - newHeight) / 2;
+        ctx.drawImage(img, xOffset, yOffset, newWidth, newHeight);
+        drawPoints();
       };
-      img.src = imageFiles[currentIndex];
+      img.src = src;
     }
 
     function drawPoints() {
-      ctx.fillStyle = "red";
-      for (const [i, pt] of points.entries()) {
+      for (let i = 0; i < clickPoints.length; i++) {
+        const pt = clickPoints[i];
         ctx.beginPath();
-        ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2);
+        ctx.arc(pt.x, pt.y, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = i % 2 === 0 ? "red" : "blue";
         ctx.fill();
-        ctx.fillText(i + 1, pt.x + 6, pt.y - 6);
       }
+    }
+
+    function resetPoints() {
+      clickPoints = [];
     }
 
     canvas.addEventListener("click", function (e) {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      points.push({ x, y });
-      loadImage();
-      setTimeout(drawPoints, 50);
+      clickPoints.push({ x, y });
+      drawPoints();
     });
 
-    document.getElementById("prevBtn").addEventListener("click", () => {
-      if (currentIndex > 0) {
-        currentIndex--;
-        loadImage();
+    function showImage(index) {
+      resetPoints();
+      loadImage(imageList[index]);
+    }
+
+    function previousImage() {
+      if (currentImageIndex > 0) {
+        currentImageIndex--;
+        showImage(currentImageIndex);
       }
-    });
+    }
 
-    document.getElementById("nextBtn").addEventListener("click", () => {
-      if (currentIndex < imageFiles.length - 1) {
-        currentIndex++;
-        loadImage();
+    function nextImage() {
+      if (currentImageIndex < imageList.length - 1) {
+        currentImageIndex++;
+        showImage(currentImageIndex);
       }
-    });
+    }
 
-    document.getElementById("resetBtn").addEventListener("click", () => {
-      points = [];
-      loadImage();
-    });
+    function resetImages() {
+      currentImageIndex = 0;
+      showImage(currentImageIndex);
+    }
 
-    loadImage();
+    window.onload = function () {
+      showImage(currentImageIndex);
+      document.getElementById("prevBtn").addEventListener("click", previousImage);
+      document.getElementById("nextBtn").addEventListener("click", nextImage);
+      document.getElementById("resetBtn").addEventListener("click", resetImages);
+    };
   </script>
 </body>
 </html>
