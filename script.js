@@ -13,9 +13,31 @@ const imageList = [
   "KJJeong11.png"
 ];
 
+const canvas = document.getElementById("imageCanvas");
+const ctx = canvas.getContext("2d");
+
 function showImage(index) {
-  const imageDisplay = document.getElementById("imageDisplay");
-  imageDisplay.src = imageList[index];
+  const img = new Image();
+  img.src = imageList[index];
+  img.onload = function () {
+    // 캔버스 초기화
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 이미지 비율 유지
+    const aspectRatio = img.width / img.height;
+    let drawWidth = canvas.width;
+    let drawHeight = canvas.width / aspectRatio;
+
+    if (drawHeight > canvas.height) {
+      drawHeight = canvas.height;
+      drawWidth = canvas.height * aspectRatio;
+    }
+
+    const offsetX = (canvas.width - drawWidth) / 2;
+    const offsetY = (canvas.height - drawHeight) / 2;
+
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+  };
 }
 
 function previousImage() {
@@ -37,7 +59,7 @@ function resetImages() {
   showImage(currentImageIndex);
 }
 
-window.onload = function() {
+window.onload = function () {
   showImage(currentImageIndex);
   document.getElementById("prevBtn").addEventListener("click", previousImage);
   document.getElementById("nextBtn").addEventListener("click", nextImage);
