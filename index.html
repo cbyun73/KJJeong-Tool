@@ -48,19 +48,14 @@
 
   <script>
     const imageList = [
-      "KJJeong1.png",
-      "KJJeong2.png",
-      "KJJeong3.png",
-      "KJJeong4.jpg",
-      "KJJeong5.png",
-      "KJJeong5.1.png",
-      "KJJeong6.png",
-      "KJJeong7.jpg",
-      "KJJeong8.png",
-      "KJJeong9.jpg",
-      "KJJeong10.png",
-      "KJJeong11.png",
+      "KJJeong1.png", "KJJeong2.png", "KJJeong3.png", "KJJeong4.jpg",
+      "KJJeong5.png", "KJJeong5.1.png", "KJJeong6.png", "KJJeong7.jpg",
+      "KJJeong8.png", "KJJeong9.jpg", "KJJeong10.png", "KJJeong11.png",
       "GaheunLee-KyougJinJeong-EunyoungYang2.png"
+    ];
+
+    const pointLabels = [
+      "1. 정수리", "2. 턱", "3. 가랑이", "4. 발끝", "5. 배꼽", "6. 손끝"
     ];
 
     let currentImageIndex = 0;
@@ -89,7 +84,9 @@
         ctx.fillStyle = "red";
         ctx.fill();
         ctx.font = "16px Arial";
-        ctx.fillText((i + 1).toString(), pt.x + 8, pt.y - 8);
+        ctx.fillStyle = "blue";
+        const label = pointLabels[i] || `${i + 1}`;
+        ctx.fillText(label, pt.x + 8, pt.y - 8);
       });
     }
 
@@ -109,7 +106,7 @@
         coordsDisplay.textContent = "선택된 좌표 없음";
       } else {
         coordsDisplay.textContent = points
-          .map((pt, i) => `${i + 1}. (${pt.x.toFixed(1)}, ${pt.y.toFixed(1)})`)
+          .map((pt, i) => `${pointLabels[i] || i + 1}: (${pt.x.toFixed(1)}, ${pt.y.toFixed(1)})`)
           .join("\n");
       }
     }
@@ -140,14 +137,13 @@
 
     document.getElementById("copyBtn").addEventListener("click", () => {
       const text = points
-        .map((pt, i) => `${i + 1}. (${pt.x.toFixed(1)}, ${pt.y.toFixed(1)})`)
+        .map((pt, i) => `${pointLabels[i] || i + 1}: (${pt.x.toFixed(1)}, ${pt.y.toFixed(1)})`)
         .join("\n");
       navigator.clipboard.writeText(text).then(() => {
         alert("좌표가 복사되었습니다!");
       });
     });
 
-    // 초기 이미지 로드
     loadImage(currentImageIndex);
   </script>
 </body>
