@@ -3,122 +3,114 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Image Analyzer</title>
+  <title>KJJeong 측정 도구</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
       margin: 0;
-      padding: 0;
+      padding: 20px;
     }
-    canvas {
-      border: 1px solid #ccc;
-      margin-top: 10px;
+    #imageDisplay {
+      max-width: 100%;
+      height: auto;
     }
-    .button-group {
-      margin-top: 10px;
+    #buttonContainer {
+      margin-top: 20px;
     }
     button {
-      margin: 0 5px;
-      padding: 8px 12px;
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    #coordinateList {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background: #f9f9f9;
+      padding: 10px;
+      border: 1px solid #ccc;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
     }
   </style>
 </head>
 <body>
   <h2>정경진 이미지 측정 도구</h2>
-  <div class="button-group">
+  <img id="imageDisplay" src="" alt="이미지" />
+  
+  <div id="buttonContainer">
     <button id="prevBtn">이전</button>
     <button id="nextBtn">다음</button>
     <button id="resetBtn">초기화</button>
+    <button id="copyBtn">복사</button>
   </div>
-  <canvas id="imageCanvas" width="800" height="1200"></canvas>
+
+  <div id="coordinateList"></div>
+
   <script>
-    let currentImageIndex = 0;
     const imageList = [
-      "KJJeong1.png",
-      "KJJeong2.png",
-      "KJJeong3.png",
-      "KJJeong4.png",
-      "KJJeong5.png",
-      "KJJeong6.png",
-      "KJJeong7.png",
-      "KJJeong8.png",
-      "KJJeong9.png",
-      "KJJeong10.png",
-      "KJJeong11.png"
+      "KJJeong1.png", "KJJeong2.png", "KJJeong3.png",
+      "KJJeong4.png", "KJJeong5.png", "KJJeong6.png",
+      "KJJeong7.png", "KJJeong8.png", "KJJeong9.png",
+      "KJJeong10.png", "KJJeong11.png"
     ];
 
-    const canvas = document.getElementById("imageCanvas");
-    const ctx = canvas.getContext("2d");
+    let currentImageIndex = 0;
+    let coordinates = {};
 
-    let img = new Image();
-    let clickPoints = [];
-
-    function loadImage(src) {
-      img.onload = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const ratio = Math.min(canvas.width / img.width, canvas.height / img.height);
-        const newWidth = img.width * ratio;
-        const newHeight = img.height * ratio;
-        const xOffset = (canvas.width - newWidth) / 2;
-        const yOffset = (canvas.height - newHeight) / 2;
-        ctx.drawImage(img, xOffset, yOffset, newWidth, newHeight);
-        drawPoints();
-      };
-      img.src = src;
-    }
-
-    function drawPoints() {
-      for (let i = 0; i < clickPoints.length; i++) {
-        const pt = clickPoints[i];
-        ctx.beginPath();
-        ctx.arc(pt.x, pt.y, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = i % 2 === 0 ? "red" : "blue";
-        ctx.fill();
-      }
-    }
-
-    function resetPoints() {
-      clickPoints = [];
-    }
-
-    canvas.addEventListener("click", function (e) {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      clickPoints.push({ x, y });
-      drawPoints();
-    });
+    const imageDisplay = document.getElementById("imageDisplay");
+    const coordinateList = document.getElementById("coordinateList");
 
     function showImage(index) {
-      resetPoints();
-      loadImage(imageList[index]);
+      imageDisplay.src = imageList[index];
+      updateCoordinateDisplay();
     }
 
-    function previousImage() {
+    function updateCoordinateDisplay() {
+      const fileName = imageList[currentImageIndex];
+      const points = coordinates[fileName] || [];
+      coordinateList.textContent = `파일: ${fileName}\n좌표 (${points.length}개):\n` + points.map((p, i) => `${i+1}. x: ${p.x}, y: ${p.y}`).join("\n");
+    }
+
+    imageDisplay.addEventListener("click", function (event) {
+      const rect = imageDisplay.getBoundingClientRect();
+      const x = Math.round(event.clientX - rect.left);
+      const y = Math.round(event.clientY - rect.top);
+      const fileName = imageList[currentImageIndex];
+      if (!coordinates[fileName]) coordinates[fileName] = [];
+      coordinates[fileName].push({ x, y });
+      updateCoordinateDisplay();
+    });
+
+    document.getElementById("prevBtn").addEventListener("click", () => {
       if (currentImageIndex > 0) {
         currentImageIndex--;
         showImage(currentImageIndex);
       }
-    }
+    });
 
-    function nextImage() {
+    document.getElementById("nextBtn").addEventListener("click", () => {
       if (currentImageIndex < imageList.length - 1) {
         currentImageIndex++;
         showImage(currentImageIndex);
       }
-    }
+    });
 
-    function resetImages() {
-      currentImageIndex = 0;
-      showImage(currentImageIndex);
-    }
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      coordinates[imageList[currentImageIndex]] = [];
+      updateCoordinateDisplay();
+    });
+
+    document.getElementById("copyBtn").addEventListener("click", () => {
+      const text = coordinateList.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("좌표 복사 완료!");
+      });
+    });
 
     window.onload = function () {
       showImage(currentImageIndex);
-      document.getElementById("prevBtn").addEventListener("click", previousImage);
-      document.getElementById("nextBtn").addEventListener("click", nextImage);
-      document.getElementById("resetBtn").addEventListener("click", resetImages);
     };
   </script>
 </body>
