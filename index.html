@@ -2,29 +2,90 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>KJJeong Analyzer</title>
+  <title>정경진 측정 도구</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h2>KJJeong 기준점 측정 도구 (아이패드 전용)</h2>
+  <h1>정경진 측정 도구</h1>
 
-  <div class="controls">
-    <button onclick="prevImage()">← 이전</button>
-    <button onclick="nextImage()">다음 →</button>
-    <button onclick="reset()">기준점 초기화</button>
-    <button onclick="copyResult()">결과 복사</button>
+  <canvas id="imageCanvas" width="800" height="1000"></canvas>
+
+  <div style="margin-top: 20px;">
+    <button id="prevBtn">이전</button>
+    <button id="nextBtn">다음</button>
+    <button id="resetBtn">초기화</button>
   </div>
 
-  <div id="image-container">
-    <img id="main-image" src="KJJeong1.png" alt="분석 이미지" />
-    <canvas id="overlay"></canvas>
-  </div>
+  <script>
+    const imageFiles = [
+      "KJJeong1.png",
+      "KJJeong2.png",
+      "KJJeong3.png",
+      "KJJeong4.png",
+      "KJJeong5.png",
+      "KJJeong6.png",
+      "KJJeong7.png",
+      "KJJeong8.png",
+      "KJJeong9.png",
+      "KJJeong10.png",
+      "KJJeong11.png"
+    ];
 
-  <div id="result-box">
-    기준점을 클릭해 주세요 (정수리 → 턱 → 엉덩이 → 발끝 → 손끝)
-  </div>
+    let currentIndex = 0;
+    const canvas = document.getElementById("imageCanvas");
+    const ctx = canvas.getContext("2d");
 
-  <script src="script.js"></script>
+    let points = [];
+
+    function loadImage() {
+      const img = new Image();
+      img.onload = function () {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        points = [];
+      };
+      img.src = imageFiles[currentIndex];
+    }
+
+    function drawPoints() {
+      ctx.fillStyle = "red";
+      for (const [i, pt] of points.entries()) {
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillText(i + 1, pt.x + 6, pt.y - 6);
+      }
+    }
+
+    canvas.addEventListener("click", function (e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      points.push({ x, y });
+      loadImage();
+      setTimeout(drawPoints, 50);
+    });
+
+    document.getElementById("prevBtn").addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        loadImage();
+      }
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      if (currentIndex < imageFiles.length - 1) {
+        currentIndex++;
+        loadImage();
+      }
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      points = [];
+      loadImage();
+    });
+
+    loadImage();
+  </script>
 </body>
 </html>
