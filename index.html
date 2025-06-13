@@ -1,14 +1,30 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>KJJeong Tool</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KJJeong Analyzer</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <h1>정경진 도구</h1>
-    <p>정상 작동 테스트용 페이지입니다.</p>
-    <script src="script.js"></script>
+  <h2>KJJeong 기준점 측정 도구 (아이패드 전용)</h2>
+
+  <div class="controls">
+    <button onclick="prevImage()">← 이전</button>
+    <button onclick="nextImage()">다음 →</button>
+    <button onclick="reset()">기준점 초기화</button>
+    <button onclick="copyResult()">결과 복사</button>
+  </div>
+
+  <div id="image-container">
+    <img id="main-image" src="KJJeong1.png" alt="분석 이미지" />
+    <canvas id="overlay"></canvas>
+  </div>
+
+  <div id="result-box">
+    기준점을 클릭해 주세요 (정수리 → 턱 → 엉덩이 → 발끝 → 손끝)
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
