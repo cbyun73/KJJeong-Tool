@@ -10,13 +10,11 @@
       margin: 0;
       padding: 20px;
     }
-
     #imageCanvas {
       border: 1px solid #ccc;
-      max-width: 90vw;
-      max-height: 80vh;
+      max-width: 95vw;
+      max-height: 95vh;
     }
-
     #buttonContainer {
       display: flex;
       justify-content: center;
@@ -24,10 +22,9 @@
       margin-top: 10px;
       gap: 10px;
     }
-
     #coords {
       margin-top: 20px;
-      font-size: 14px;
+      font-size: 15px;
       white-space: pre-wrap;
     }
   </style>
@@ -35,7 +32,7 @@
 <body>
   <h1>인물 이미지 측정 도구</h1>
 
-  <canvas id="imageCanvas" style="max-width: 95vw; max-height: 95vh;"></canvas>
+  <canvas id="imageCanvas"></canvas>
 
   <div id="buttonContainer">
     <button id="prevBtn">이전</button>
@@ -56,14 +53,14 @@
       "GahunLee1.jpg", "GahunLee2.jpg", "GahunLee3.png", "GahunLee4.png",
       "GahunLee5.png", "GahunLee6.png", "GahunLee7.png", "GahunLee8.png",
       "MrnameKim1.jpg", "MrnameKim2.jpg", "MrnameKim3.jpg", "MrnameKim4.jpg",
-      "MrnameKim5.png", "MrnameKim6.jpg", "ChaehaKim1.jpg", "ChaehaKim2.jpg", 
-      "ChaehaKim3.jpg", "ChaehaKim4.jpg", "ChaehaKim5.jpg", "ChaehaKim6.jpg", 
-      "ChaehaKim7.png", "HanaCho1.jpg", "HanaCho2.jpg", "HanaCho3.jpg", 
-      "HanaCho4.jpg", "HanaCho5.jpg", "HanaCho6.jpg", "HanaCho7.jpg", 
+      "MrnameKim5.png", "MrnameKim6.jpg", "ChaehaKim1.jpg", "ChaehaKim2.jpg",
+      "ChaehaKim3.jpg", "ChaehaKim4.jpg", "ChaehaKim5.jpg", "ChaehaKim6.jpg",
+      "ChaehaKim7.png", "HanaCho1.jpg", "HanaCho2.jpg", "HanaCho3.jpg",
+      "HanaCho4.jpg", "HanaCho5.jpg", "HanaCho6.jpg", "HanaCho7.jpg",
       "HanaCho8.jpg", "HanaCho9.png", "HanaCho10.jpg", "SooinLee1.jpg",
-      "SooinLee2.jpg", "SooinLee3.jpg", "SooinLee4.jpg", "SooinLee5.jpg", 
-      "SooinLee6.jpg", "SooinLee7.jpg", "SooinLee8.jpg", "SooinLee9.jpg", "SooinLee10.jpg", 
-      "GaheunLee-KyougJinJeong-EunyoungYang2.png", "GaheunLee-KyougJinJeong-EunyoungYang.png", 
+      "SooinLee2.jpg", "SooinLee3.jpg", "SooinLee4.jpg", "SooinLee5.jpg",
+      "SooinLee6.jpg", "SooinLee7.jpg", "SooinLee8.jpg", "SooinLee9.jpg", "SooinLee10.jpg",
+      "GaheunLee-KyougJinJeong-EunyoungYang2.png", "GaheunLee-KyougJinJeong-EunyoungYang.png",
       "GaheunLee-KyougJinJeong-EunyoungYang3.png", "169.1-GaheunLee.png",
       "EunjiSong-KyungjinJeong-GahunLee-EunyeongYang.png", "EunjiSong-KyungjinJeong-GahunLee-EunyeongYang-SuhyunHwang.png"
     ];
@@ -106,14 +103,9 @@
     }
 
     function updateCoordsDisplay() {
-      if (points.length === 0) {
-        coordsDisplay.textContent = "선택된 좌표 없음";
-      } else {
-        coordsDisplay.textContent = points
-          .map((pt, i) => `${pointLabels[i] || i + 1}: (${pt.x.toFixed(1)}, ${pt.y.toFixed(1)})`)
-          .join("
-");
-      }
+      coordsDisplay.textContent = points.length === 0
+        ? "선택된 좌표 없음"
+        : points.map((pt, i) => `${pointLabels[i] || i + 1}: (${pt.x.toFixed(1)}, ${pt.y.toFixed(1)})`).join("\n");
     }
 
     canvas.addEventListener("click", function (e) {
@@ -139,7 +131,7 @@
     document.getElementById("nextBtn").addEventListener("click", () => {
       if (points.length >= 6) {
         const fileName = imageList[currentImageIndex];
-        const yValues = points.map((pt) => pt.y.toFixed(1));
+        const yValues = points.map(pt => pt.y.toFixed(1));
         results.push([fileName, ...yValues]);
       }
       if (currentImageIndex < imageList.length - 1) {
@@ -167,8 +159,7 @@
     document.getElementById("copyBtn").addEventListener("click", () => {
       const text = points
         .map((pt, i) => `${pointLabels[i] || i + 1}: (${pt.x.toFixed(1)}, ${pt.y.toFixed(1)})`)
-        .join("
-");
+        .join("\n");
       navigator.clipboard.writeText(text).then(() => {
         alert("좌표가 복사되었습니다!");
       });
@@ -181,11 +172,9 @@
         results.push([fileName, ...yValues]);
       }
 
-      let csvContent = "data:text/csv;charset=utf-8,파일명,정수리Y,턱Y,가랑이Y,발끝Y,배꼽Y,손끝Y
-";
+      let csvContent = "data:text/csv;charset=utf-8,파일명,정수리Y,턱Y,가랑이Y,발끝Y,배꼽Y,손끝Y\n";
       results.forEach(row => {
-        csvContent += row.join(",") + "
-";
+        csvContent += row.join(",") + "\n";
       });
 
       const encodedUri = encodeURI(csvContent);
