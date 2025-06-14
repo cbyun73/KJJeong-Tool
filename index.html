@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>이미지 좌표 측정</title>
+  <title>인물 이미지 측정 도구</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -112,7 +111,8 @@
       } else {
         coordsDisplay.textContent = points
           .map((pt, i) => `${pointLabels[i] || i + 1}: (${pt.x.toFixed(1)}, ${pt.y.toFixed(1)})`)
-          .join("\n");
+          .join("
+");
       }
     }
 
@@ -167,7 +167,8 @@
     document.getElementById("copyBtn").addEventListener("click", () => {
       const text = points
         .map((pt, i) => `${pointLabels[i] || i + 1}: (${pt.x.toFixed(1)}, ${pt.y.toFixed(1)})`)
-        .join("\n");
+        .join("
+");
       navigator.clipboard.writeText(text).then(() => {
         alert("좌표가 복사되었습니다!");
       });
@@ -180,9 +181,11 @@
         results.push([fileName, ...yValues]);
       }
 
-      let csvContent = "data:text/csv;charset=utf-8,파일명,정수리Y,턱Y,가랑이Y,발끝Y,배꼽Y,손끝Y\n";
+      let csvContent = "data:text/csv;charset=utf-8,파일명,정수리Y,턱Y,가랑이Y,발끝Y,배꼽Y,손끝Y
+";
       results.forEach(row => {
-        csvContent += row.join(",") + "\n";
+        csvContent += row.join(",") + "
+";
       });
 
       const encodedUri = encodeURI(csvContent);
