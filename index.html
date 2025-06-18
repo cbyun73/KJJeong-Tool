@@ -1,34 +1,44 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <title>인물 이미지 측정 도구</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 20px;
-    }
-    #imageCanvas {
-      border: 1px solid #ccc;
-      max-width: 95vw;
-      max-height: 95vh;
-    }
-    #buttonContainer {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      gap: 10px;
-    }
-    #coords {
-      margin-top: 20px;
-      font-size: 15px;
-      white-space: pre-wrap;
-    }
-  </style>
-</head>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+    background: #fff;
+  }
+  h1 {
+    margin-bottom: 20px;
+  }
+  #imageCanvas {
+    border: 1px solid #ccc;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+  #buttonContainer {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+  }
+  #coords {
+    margin-top: 15px;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-line;
+    text-align: left;
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px dashed #aaa;
+    width: 90%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 6px;
+  }
+</style>
 <body>
   <h1>인물 이미지 측정 도구</h1>
 
