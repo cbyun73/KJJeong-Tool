@@ -1,132 +1,124 @@
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin: 0;
-    padding: 20px;
-    background: #fff;
-  }
-  h1 {
-    margin-bottom: 20px;
-  }
-  #imageCanvas {
-  border: 1px solid #ccc;
-  width: 90vw;           /* ✅ 뷰포트 기준 너비 */
-  max-width: 400px;      /* ✅ 최대는 400px */
-  height: auto;
-  display: block;
-  margin: 0 auto;
-}
-  #buttonContainer {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 10px 0;
-  }
-  #coords {
-    margin-top: 15px;
-    font-size: 14px;
-    line-height: 1.6;
-    white-space: pre-line;
-    text-align: left;
-    padding: 10px;
-    background: #f9f9f9;
-    border: 1px dashed #aaa;
-    width: 90%;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 6px;
-  }
-</style>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>인물 이미지 측정 도구</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background: #fff;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    #imageCanvas {
+      border: 1px solid #ccc;
+      width: 90vw;      /* 뷰포트 기준 너비 */
+      max-width: 400px; /* 최대 400px */
+      height: auto;
+      display: block;
+      margin: 10px auto;
+    }
+    #buttonContainer {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    #coords {
+      margin-top: 15px;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-line;
+      text-align: left;
+      padding: 10px;
+      background: #f9f9f9;
+      border: 1px dashed #aaa;
+      width: 90%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 6px;
+    }
+    #fileInputWrapper {
+      margin-bottom: 10px;
+    }
+    #fileInput {
+      margin-top: 5px;
+    }
+  </style>
+</head>
 <body>
   <h1>인물 이미지 측정 도구</h1>
+
+  <div id="fileInputWrapper">
+    <div>측정할 이미지를 선택하세요. (여러 장 선택 가능)</div>
+    <input type="file" id="fileInput" accept="image/*" multiple>
+  </div>
 
   <canvas id="imageCanvas"></canvas>
 
   <div id="buttonContainer">
     <button id="prevBtn">이전</button>
     <button id="nextBtn">다음</button>
-    <button id="resetBtn">초기화</button>
-    <button id="clearAllBtn">전체초기화</button>
-    <button id="copyBtn">복사</button>
+    <button id="resetBtn">현재 이미지 좌표 초기화</button>
+    <button id="clearAllBtn">전체 데이터 초기화</button>
+    <button id="copyBtn">현재 좌표 복사</button>
     <button id="downloadBtn">CSV 다운로드</button>
   </div>
 
-  <div id="coords">선택된 좌표 없음</div>
+  <div id="coords">이미지를 선택한 뒤, 좌표를 클릭해 주세요.</div>
 
   <script>
-    const imageList = [
-      "ByKirin1.jpg", "ByKirin2.png", "ByKirin3.jpg", "ByKirin4.jpg", "ByKirin5.jpg",
-      "KJJeong8.png", "maycoco_0702.png", "maycoco_2.png", "SoojinYoon1.png", 
-      "SoojinYoon2.jpg", "SoojinYoon3.jpg", "SoojinYoon4.jpg", "SoojinYoon5.png", 
-      "JayKim1.jpg", "JayKim2.png", "JayKim4.png", "JayKim6.png", "JayKim7.jpg", "JayKim8.png", 
-      "JayKim9.png", "HyunuJeong1.png", "HyunuJeong2.png", "HyunuJeong3.jpg", "HyunuJeong5.png", 
-      "HyunuJeong6.png", "HyunuJeong7.png", "HyunuJeong9.png", "HyunuJeong10.png", 
-      "JieunKwon1.png", "JieunKwon2.jpg", "JieunKwon3.jpg", "JieunKwon4.png", "JieunKwon5.png", 
-      "JieunKwon6.png", "JieunKwon7.png", "JieunKwon8.png", "JieunKwon9.png", "A_KahyunKim2.png", 
-      "A_KahyunKim3.png", "A_KahyunKim4.png", "A_KahyunKim5.png", "A_KahyunKim6.png", 
-      "A_KahyunKim7.png", "a_MinyoungKang1.png", "a_MinyoungKang3.png", "a_MinyoungKang4.png", 
-      "a_MinyoungKang5.png", "a_MinyoungKang6.png", "a_MinyoungKang7.jpg", "a_MinyoungKang8.png",
-      "DawoonKim1.jpg", "DawoonKim2.jpg", "DawoonKim3.jpg", "DawoonKim4.jpg", "DawoonKim5.png", 
-      "DawoonKim6.png", "DawoonKim8.png", "NayoungKim1.jpg", "NayoungKim2.jpg", "NayoungKim3.jpg", 
-      "NayoungKim4.jpg", "NayoungKim5.png", "NayoungKim6.png", "NayoungKim7.png", 
-      "SiaLee1.png", "SiaLee3.png", "SiaLee4.png", "SiaLee5.png", "SiaLee6.png", "SiaLee7.png", 
-      "SiaLee8.png", "SoheeSon1.png", "SoheeSon2.png", "SoheeSon3.png", "SoheeSon4.png", 
-      "SoheeSon5.png", "SoheeSon6.png", "SoheeSon7.png", "SoheeSon8.png", "SoheeSon9.png", 
-      "BoraKang1.png", "BoraKang2.png", "BoraKang3.png", "BoraKang4.png", "BoraKang5.png", "BoraKang6.png", 
-      "YuriPark1.png", "YuriPark2.jpg", "YuriPark3.jpg", "YuriPark8.png", "YuriPark9.png",
-      "HyuniShin1.png", "HyuniShin3.png", "HyuniShin4.png", "HyuniShin6.png", 
-      "SubinKim1.jpg", "SubinKim2.png", "SubinKim3.png", "SubinKim4.png", "SubinKim5.jpg",
-      "EunyeongYang1.png", "EunyeongYang2.png", "EunyeongYang4.png", "EunyeongYang5.png",
-      "HyunJeongKim1.jpg", "HyunJeongKim2.png", "HyunJeongKim4.png", "HyunJeongKim5.png", 
-      "HyunJeongKim6.png", "HyunJeongKim7.png", "A_GyuriShim1.jpg", "A_GyuriShim2.png",
-      "A_GyuriShim3.png", "A_GyuriShim4.png", "A_GyuriShim5.png", "A_GyuriShim6.jpg", "A_GyuriShim7.png", 
-      "KJJeong2.png", "KJJeong3.png", "KJJeong4.jpg",
-      "KJJeong6.png", "KJJeong8.png", "KJJeong10.png", 
-      "GahunLee1.jpg", "GahunLee2.jpg", "GahunLee4.png", "GahunLee6.png", "GahunLee7.png", 
-      "MrnameKim1.jpg", "MrnameKim2.png", "MrnameKim3.png", "MrnameKim4.jpg",
-      "MrnameKim5.png", "MrnameKim6.jpg", "ChaehaKim1.jpg", "ChaehaKim2.jpg",
-      "ChaehaKim3.jpg", "ChaehaKim6.jpg", "HanaCho2.jpg", "HanaCho6.jpg", "HanaCho7.jpg",
-      "SooinLee2.png", "SooinLee5.jpg", "SooinLee6.jpg", "SooinLee7.png", "SooinLee8.png",  
-      "Photoroom_test_1.jpg", "Photoroom_test_2.jpg", "JiyoonKang1.png", "JiyoonKang6.png", 
-      "JiyoonKang2.jpg", "JiyoonKang3.jpg", "JiyoonKang5.jpg", "JiyoonKang7.jpg", 
-      "NariLee1.png", "NariLee2.png", "NariLee3.png", "NariLee4.png", "NariLee5.png",
-      "NariLee6.png", "NariLee7.png", 
-    ];
+    // 선택된 로컬 이미지 파일 목록
+    let imageFiles = [];
+    let currentImageIndex = 0;
+    let points = [];
+    const results = [];
 
     const pointLabels = [
       "1. 정수리", "2. 턱", "3. 가랑이", "4. 발끝", "5. 배꼽", "6. 손끝"
     ];
 
-    let currentImageIndex = 0;
-    let points = [];
-    const results = [];
-
     const canvas = document.getElementById("imageCanvas");
     const ctx = canvas.getContext("2d");
     const coordsDisplay = document.getElementById("coords");
+    const fileInput = document.getElementById("fileInput");
 
     function loadImage(index) {
+      const file = imageFiles[index];
+      if (!file) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        coordsDisplay.textContent = "이미지를 선택한 뒤 사용하세요.";
+        return;
+      }
+
       const img = new Image();
+      const url = URL.createObjectURL(file);
+
       img.onload = () => {
         canvas.width = img.width;
         canvas.height = img.height;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
         drawPoints();
+        URL.revokeObjectURL(url); // 메모리 정리
+        updateCoordsDisplay();
       };
-      img.src = "https://cbyun73.github.io/KJJeong-Tool/" + imageList[index];
+      img.src = url;
     }
 
     function drawPoints() {
+      ctx.font = "24px Arial";
       points.forEach((pt, i) => {
         ctx.beginPath();
         ctx.arc(pt.x, pt.y, 5, 0, 2 * Math.PI);
         ctx.fillStyle = "red";
         ctx.fill();
-        ctx.font = "24px Arial";
         ctx.fillStyle = "blue";
         const label = pointLabels[i] || `${i + 1}`;
         ctx.fillText(label, pt.x + 8, pt.y - 8);
@@ -134,73 +126,125 @@
     }
 
     function updateCoordsDisplay() {
+      if (imageFiles.length === 0) {
+        coordsDisplay.textContent = "이미지를 선택한 뒤, 좌표를 클릭해 주세요.";
+        return;
+      }
+
       coordsDisplay.textContent = points.length === 0
         ? "선택된 좌표 없음"
-        : points.map((pt, i) => `${pointLabels[i] || i + 1}: (${pt.x.toFixed(1)}, ${pt.y.toFixed(1)})`).join("\n");
+        : points
+          .map((pt, i) => `${pointLabels[i] || i + 1}: (${pt.x.toFixed(1)}, ${pt.y.toFixed(1)})`)
+          .join("\n");
     }
 
+    // 파일 선택 시
+    fileInput.addEventListener("change", (e) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) {
+        imageFiles = [];
+        currentImageIndex = 0;
+        points = [];
+        results.length = 0;
+        loadImage(currentImageIndex);
+        return;
+      }
+
+      imageFiles = files;
+      currentImageIndex = 0;
+      points = [];
+      results.length = 0;
+      loadImage(currentImageIndex);
+    });
+
+    // 캔버스 클릭 → 좌표 추가
     canvas.addEventListener("click", function (e) {
+      if (imageFiles.length === 0) return;
+
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
       const x = (e.clientX - rect.left) * scaleX;
       const y = (e.clientY - rect.top) * scaleY;
+
       points.push({ x, y });
+
+      // 다시 그리기
       loadImage(currentImageIndex);
-      updateCoordsDisplay();
     });
 
+    // 이전 이미지
     document.getElementById("prevBtn").addEventListener("click", () => {
       if (currentImageIndex > 0) {
+        // 이동 전 현재 이미지 좌표 저장
+        if (points.length >= 6) {
+          const fileName = imageFiles[currentImageIndex].name;
+          const yValues = points.map(pt => pt.y.toFixed(1));
+          results.push([fileName, ...yValues]);
+        }
         currentImageIndex--;
         points = [];
         loadImage(currentImageIndex);
-        updateCoordsDisplay();
       }
     });
 
+    // 다음 이미지
     document.getElementById("nextBtn").addEventListener("click", () => {
-      if (points.length >= 6) {
-        const fileName = imageList[currentImageIndex];
-        const yValues = points.map(pt => pt.y.toFixed(1));
-        results.push([fileName, ...yValues]);
-      }
-      if (currentImageIndex < imageList.length - 1) {
+      if (currentImageIndex < imageFiles.length - 1) {
+        // 이동 전 현재 이미지 좌표 저장
+        if (points.length >= 6) {
+          const fileName = imageFiles[currentImageIndex].name;
+          const yValues = points.map(pt => pt.y.toFixed(1));
+          results.push([fileName, ...yValues]);
+        }
         currentImageIndex++;
         points = [];
         loadImage(currentImageIndex);
-        updateCoordsDisplay();
       }
     });
 
+    // 현재 이미지 좌표 초기화
     document.getElementById("resetBtn").addEventListener("click", () => {
       points = [];
       loadImage(currentImageIndex);
-      updateCoordsDisplay();
     });
 
+    // 전체 데이터 초기화
     document.getElementById("clearAllBtn").addEventListener("click", () => {
       points = [];
       results.length = 0;
       loadImage(currentImageIndex);
-      updateCoordsDisplay();
       alert("전체 데이터가 초기화되었습니다.");
     });
 
+    // 현재 좌표 텍스트 복사
     document.getElementById("copyBtn").addEventListener("click", () => {
       const text = points
         .map((pt, i) => `${pointLabels[i] || i + 1}: (${pt.x.toFixed(1)}, ${pt.y.toFixed(1)})`)
         .join("\n");
+      if (!text) {
+        alert("복사할 좌표가 없습니다.");
+        return;
+      }
       navigator.clipboard.writeText(text).then(() => {
         alert("좌표가 복사되었습니다!");
+      }).catch(() => {
+        alert("복사 실패. 드래그해서 직접 복사해 주세요.");
       });
     });
 
+    // CSV 다운로드
     document.getElementById("downloadBtn").addEventListener("click", () => {
-      if (points.length >= 6) {
-        const fileName = imageList[currentImageIndex];
-        const yValues = points.map((pt) => pt.y.toFixed(1));
+      // 현재 이미지 좌표도 포함
+      if (imageFiles.length > 0 && points.length >= 6) {
+        const fileName = imageFiles[currentImageIndex].name;
+        const yValues = points.map(pt => pt.y.toFixed(1));
         results.push([fileName, ...yValues]);
+      }
+
+      if (results.length === 0) {
+        alert("다운로드할 데이터가 없습니다.");
+        return;
       }
 
       let csvContent = "data:text/csv;charset=utf-8,파일명,정수리Y,턱Y,가랑이Y,발끝Y,배꼽Y,손끝Y\n";
@@ -217,7 +261,8 @@
       document.body.removeChild(link);
     });
 
-    loadImage(currentImageIndex);
+    // 초기 상태
+    updateCoordsDisplay();
   </script>
 </body>
 </html>
