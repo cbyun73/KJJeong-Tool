@@ -80,8 +80,16 @@
     let points = [];
     const results = [];
 
+    // ✅ 6개 → 8개로 확장 (기존 1~6 유지, 7·8 추가)
     const pointLabels = [
-      "1. 정수리", "2. 턱", "3. 가랑이", "4. 발끝", "5. 배꼽", "6. 손끝"
+      "1. 정수리",
+      "2. 턱",
+      "3. 가랑이",
+      "4. 발끝",
+      "5. 배꼽",
+      "6. 손끝",
+      "7. 무릎",
+      "8. 어깨"
     ];
 
     const canvas = document.getElementById("imageCanvas");
@@ -177,7 +185,7 @@
     document.getElementById("prevBtn").addEventListener("click", () => {
       if (currentImageIndex > 0) {
         // 이동 전 현재 이미지 좌표 저장
-        if (points.length >= 6) {
+        if (points.length >= 8) {   // ✅ 6 → 8
           const fileName = imageFiles[currentImageIndex].name;
           const yValues = points.map(pt => pt.y.toFixed(1));
           results.push([fileName, ...yValues]);
@@ -192,7 +200,7 @@
     document.getElementById("nextBtn").addEventListener("click", () => {
       if (currentImageIndex < imageFiles.length - 1) {
         // 이동 전 현재 이미지 좌표 저장
-        if (points.length >= 6) {
+        if (points.length >= 8) {   // ✅ 6 → 8
           const fileName = imageFiles[currentImageIndex].name;
           const yValues = points.map(pt => pt.y.toFixed(1));
           results.push([fileName, ...yValues]);
@@ -236,7 +244,7 @@
     // CSV 다운로드
     document.getElementById("downloadBtn").addEventListener("click", () => {
       // 현재 이미지 좌표도 포함
-      if (imageFiles.length > 0 && points.length >= 6) {
+      if (imageFiles.length > 0 && points.length >= 8) {  // ✅ 6 → 8
         const fileName = imageFiles[currentImageIndex].name;
         const yValues = points.map(pt => pt.y.toFixed(1));
         results.push([fileName, ...yValues]);
@@ -247,7 +255,8 @@
         return;
       }
 
-      let csvContent = "data:text/csv;charset=utf-8,파일명,정수리Y,턱Y,가랑이Y,발끝Y,배꼽Y,손끝Y\n";
+      // ✅ 헤더도 8포인트로 확장
+      let csvContent = "data:text/csv;charset=utf-8,파일명,정수리Y,턱Y,가랑이Y,발끝Y,배꼽Y,손끝Y,무릎Y,어깨Y\n";
       results.forEach(row => {
         csvContent += row.join(",") + "\n";
       });
